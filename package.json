@@ -1,0 +1,15 @@
+{
+  "name": "tugakids-addon",
+  "version": "0.0.1",
+  "description": "Addon de Filmes Com Audio em PT-PT",
+  "main": "app.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node app.js",
+    "install": "node app.js -- --install",
+    "open": "node app.js -- --launch"
+  },
+  "dependencies": {
+    "stremio-addon-sdk": "^1.6.10"
+  }
+}
