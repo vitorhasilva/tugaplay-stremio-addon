@@ -6,10 +6,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "node app.js",
-    "install": "node app.js -- --install",
-    "open": "node app.js -- --launch"
+    "app": "node app.js -- --install",
+    "web": "node app.js -- --launch"
   },
   "dependencies": {
+    "axios": "^1.7.2",
     "stremio-addon-sdk": "^1.6.10"
   }
 }

@@ -1,21 +1,22 @@
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
-
+const TugaKids = require('./services/tugakids')
 const builder = new addonBuilder({
-  id: 'pt.tugakids.addon',
-  version: '0.0.1',
-  name: 'TugaKids.com addon',
+  id: 'pt.tugaplay.stream',
+  version: '1.0.0',
+  name: 'TugaPlay',
+  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros.',
+  logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
   catalogs: [],
   resources: ['stream'],
   types: ['movie'],
   idPrefixes: ['tt']
 })
 
-// takes function(args)
-builder.defineStreamHandler(function (args) {
+
+
+builder.defineStreamHandler(async function (args) {
   if (args.type === 'movie') {
-    const stream = { name: "TugaKids.com", url: `https://tkapp24.buzz/${args.id.substring(2)}.mp4`, description: "Sem qualquer direito reservado. Para uso educacional, crítica, comentário, divulgação de notícia e pesquisa, sem qualquer finalidade lucrativa direta ou conexa!" }
-    console.log('%capp.js:21 object', 'color: #007acc;', stream);
-    return Promise.resolve({ streams: [stream] })
+    return Promise.resolve({ streams: [await TugaKids(args.type, args.id)] })
   } else {
     return Promise.resolve({ streams: [] })
   }
