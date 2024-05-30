@@ -1,3 +1,4 @@
+const https = require('https')
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
 const TugaKids = require('./services/tugakids')
 const builder = new addonBuilder({
@@ -23,4 +24,7 @@ builder.defineStreamHandler(async function (args) {
 })
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
-//publishToCentral("https://your-domain/manifest.json") // <- invoke this if you want to publish your addon and it's accessible publically on "your-domain"
+
+setInterval(() => {
+  https.get('https://tugaplay.onrender.com/manifest.json')
+}, 1000 * 60)
