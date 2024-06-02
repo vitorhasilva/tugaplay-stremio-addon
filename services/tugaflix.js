@@ -64,12 +64,15 @@ async function movieFetch(id) {
   const result = [];
   const { title, year } = await fetchIMDB(id);
   const normalize = normalizeStrings(title);
-
+  console.log('%cservices\tugaflix.js:67 normalize', 'color: #007acc;', normalize);
   const addPlayerLink = async (index) => {
     try {
       const urlPlayer = await fetchPlayer(`https://tugaflix.best/filmes/${normalize[index]}-${year}/`);
+      console.log('%cservices\tugaflix.js:71 urlPlayer', 'color: #007acc;', urlPlayer);
       const steamtapeUrl = await fetchIframeSrc(urlPlayer);
+      console.log('%cservices\tugaflix.js:73 steamtapeUrl', 'color: #007acc;', steamtapeUrl);
       const dlLink = await SteamtapeGetDlLink(steamtapeUrl);
+      console.log('%cservices\tugaflix.js:75 dlLink', 'color: #007acc;', dlLink);
       if (dlLink) {
         result.push({
           name: index === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (VP)",
@@ -88,7 +91,7 @@ async function movieFetch(id) {
   if (normalize.length > 1) {
     await addPlayerLink(1);
   }
-
+  console.log('%cservices\tugaflix.js:94 ', 'color: #007acc;', result.length < 1 ? undefined : result);
   return result.length < 1 ? undefined : result;
 };
 
