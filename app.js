@@ -1,8 +1,10 @@
 const https = require('https')
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
 const TugaKids = require('./services/tugakids')
+const TugaFlix = require('./services/tugaflix')
+
 const builder = new addonBuilder({
-  id: 'pt.tugaplay.stream',
+  id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
   version: '1.0.0',
   name: 'TugaPlay',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros.',
@@ -17,11 +19,18 @@ const builder = new addonBuilder({
 
 builder.defineStreamHandler(async function (args) {
   if (args.type === 'movie') {
-    return Promise.resolve({ streams: [await TugaKids(args.type, args.id)] })
+    let existingStreams = [];
+    existingStreams = existingStreams.concat(await TugaKids(args.type, args.id))
+    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
+    return Promise.resolve({
+      streams: existingStreams
+    })
   } else {
     return Promise.resolve({ streams: [] })
   }
 })
+
+
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 

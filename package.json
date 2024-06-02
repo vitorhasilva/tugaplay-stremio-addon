@@ -5,13 +5,14 @@
   "main": "app.js",
   "license": "MIT",
   "scripts": {
-    "dev": "node app.js",
-    "app": "node app.js -- --install",
-    "web": "node app.js -- --launch",
+    "dev": "NODE_ENV=dev node app.js",
+    "app": "NODE_ENV=dev node app.js -- --install",
+    "web": "NODE_ENV=dev node app.js -- --launch",
     "start": "node app.js"
   },
   "dependencies": {
     "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
     "jsdom": "^24.1.0",
     "stremio-addon-sdk": "^1.6.10"
   }

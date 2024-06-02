@@ -1,6 +1,6 @@
 const { JSDOM } = require('jsdom');
 
-module.exports = async function SteamtapeGetDlLink(link) {
+module.exports = async (link) => {
   try {
     if (link.includes("/e/")) {
       link = link.replace("/e/", "/v/");
@@ -30,7 +30,7 @@ module.exports = async function SteamtapeGetDlLink(link) {
       }
     }
   } catch (exception) {
-    console.error(exception);
+
   }
 
   return null;
