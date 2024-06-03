@@ -1,7 +1,7 @@
 const https = require('https')
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
 const TugaKids = require('./services/tugakids')
-const TugaFlix = require('./services/tugaflix')
+// const TugaFlix = require('./services/tugaflix')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
@@ -21,12 +21,12 @@ builder.defineStreamHandler(async function (args) {
   let existingStreams = [];
   if (args.type === 'movie') {
     existingStreams = existingStreams.concat(await TugaKids(args.type, args.id))
-    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
+    // existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     return Promise.resolve({
       streams: existingStreams
     })
   } else if (args.type === 'series') {
-    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
+    // existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     return Promise.resolve({ streams: existingStreams })
   } else {
     return Promise.resolve({ streams: [] })
@@ -37,6 +37,6 @@ builder.defineStreamHandler(async function (args) {
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 
-/* setInterval(() => {
+setInterval(() => {
   https.get('https://tugaplay.onrender.com/manifest.json')
-}, 1000 * 60) */
+}, 1000 * 60)
