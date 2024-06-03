@@ -11,20 +11,23 @@ const builder = new addonBuilder({
   logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
   catalogs: [],
   resources: ['stream'],
-  types: ['movie'],
+  types: ['movie', 'series'],
   idPrefixes: ['tt']
 })
 
 
 
 builder.defineStreamHandler(async function (args) {
+  let existingStreams = [];
   if (args.type === 'movie') {
-    let existingStreams = [];
     existingStreams = existingStreams.concat(await TugaKids(args.type, args.id))
     existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     return Promise.resolve({
       streams: existingStreams
     })
+  } else if (args.type === 'series') {
+    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
+    return Promise.resolve({ streams: existingStreams })
   } else {
     return Promise.resolve({ streams: [] })
   }
@@ -34,6 +37,6 @@ builder.defineStreamHandler(async function (args) {
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 
-setInterval(() => {
+/* setInterval(() => {
   https.get('https://tugaplay.onrender.com/manifest.json')
-}, 1000 * 60)
+}, 1000 * 60) */
