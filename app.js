@@ -1,16 +1,20 @@
 const https = require('https')
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
-const TugaKids = require('./services/tugakids')
+const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids')
 // const TugaFlix = require('./services/tugaflix')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
-  version: '1.0.0',
+  version: '1.1.0',
   name: 'TugaPlay',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros.',
   logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
-  catalogs: [],
-  resources: ['stream'],
+  catalogs: [{
+    type: 'movie',
+    id: 'tugakids',
+    name: 'TugaKids',
+  }],
+  resources: ['stream', 'catalog'],
   types: ['movie', 'series'],
   idPrefixes: ['tt']
 })
@@ -20,7 +24,7 @@ const builder = new addonBuilder({
 builder.defineStreamHandler(async function (args) {
   let existingStreams = [];
   if (args.type === 'movie') {
-    existingStreams = existingStreams.concat(await TugaKids(args.type, args.id))
+    existingStreams = existingStreams.concat(await TugaKidsStream(args.type, args.id))
     // existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     return Promise.resolve({
       streams: existingStreams
@@ -33,6 +37,17 @@ builder.defineStreamHandler(async function (args) {
   }
 })
 
+builder.defineCatalogHandler(async function (args) {
+  let existingCatalogs = [];
+  console.log(args)
+  if (args.type === 'movie') {
+    existingCatalogs = existingCatalogs.concat(await TugaKidsCatalog(args.type, args.id))
+    console.log(existingCatalogs)
+    return Promise.resolve({ metas: existingCatalogs })
+  } else {
+    return Promise.resolve({ metas: [] })
+  }
+})
 
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })

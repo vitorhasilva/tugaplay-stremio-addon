@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-module.exports = async (id) => {
+const fetchIMDBByID = async (id) => {
 
 
   const res = await axios.get(`https://www.imdb.com/title/${id}`, {
@@ -32,7 +32,13 @@ module.exports = async (id) => {
       title: [originalTitleText, originalTitleText === titleText ? undefined : titleText],
       year: releaseYear
     }
+}
 
+const fetchIMDBByName = async (name) => {
 
+}
 
+module.exports = {
+  fetchIMDBByID,
+  fetchIMDBByName
 }

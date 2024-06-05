@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const fetchIMDB = require('./imdb');
+const { fetchIMDBByID: fetchIMDB } = require('./imdb');
 const SteamtapeGetDlLink = require('./steamtape');
 
 function formatNumberInString(str) {
@@ -190,7 +190,7 @@ async function seriesFetch(imdbId) {
     await addPlayerLink(1);
   }
 
-  return result.length < 1 ? undefined : result;
+  return result.length < 1 ? [] : result;
 };
 
 module.exports = async (type, id) => {
