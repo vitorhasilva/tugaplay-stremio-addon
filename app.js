@@ -5,7 +5,7 @@ const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
-  version: '1.1.1',
+  version: '1.1.2',
   name: 'TugaPlay',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Suporte-me livremente: https://coindrop.to/vitorh_asilva',
   contactEmail: 'vitorsilva10413@gmail.com',
