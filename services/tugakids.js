@@ -24,12 +24,12 @@ const TugaKidsStream = async (type, id) => {
 
     if (exists) {
       return [{
-        name: "TugaKids.com",
+        name: "TugaKids",
         url: `https://tkapp24.buzz/${id.substring(2)}.mp4`,
-        description: "Audio em Portugues (PT-PT)"
+        description: "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://www.tugakids.com"
       }]
     }
-    else return undefined;
+    else return [];
   } else if (type === 'serie') {
     return [];
   } else

@@ -1,11 +1,12 @@
 const https = require('https')
 const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
 const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids')
+const { OTFTStream } = require('./services/osteusfilmestuga')
 // const TugaFlix = require('./services/tugaflix')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
-  version: '1.1.4',
+  version: '1.1.5',
   name: 'TugaPlay',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Suporte-me livremente: https://coindrop.to/vitorh_asilva',
   contactEmail: 'vitorsilva10413@gmail.com',
@@ -26,12 +27,13 @@ let totalUsers = 0;
 builder.defineStreamHandler(async function (args) {
   onlineUsers++;
   totalUsers++;
-  if (onlineUsers > 1)
+  if (onlineUsers > 3)
     console.log(`🟢 Online Users: ${onlineUsers}`)
 
   let existingStreams = [];
   if (args.type === 'movie') {
     existingStreams = existingStreams.concat(await TugaKidsStream(args.type, args.id))
+    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id))
     // existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     onlineUsers--;
     return Promise.resolve({
@@ -48,21 +50,15 @@ builder.defineStreamHandler(async function (args) {
 })
 
 builder.defineCatalogHandler(async function (args) {
-  onlineUsers++;
-  totalUsers++;
-
-  if (onlineUsers > 1)
-    console.log(`🟢 Online Users: ${onlineUsers}`)
 
   let existingCatalogs = [];
   if (args.type === 'movie') {
     existingCatalogs = existingCatalogs.concat(await TugaKidsCatalog(args.type, args.id))
-    onlineUsers--;
     return Promise.resolve({ metas: existingCatalogs })
   } else {
-    onlineUsers--;
     return Promise.resolve({ metas: [] })
   }
+
 })
 
 

@@ -164,9 +164,9 @@ async function seriesFetch(imdbId) {
 
       if (dlLink) {
         result.push({
-          name: index === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (PT)",
+          name: index === 0 ? 'Tugaflix (VO)' : "Tugaflix (PT)",
           url: dlLink,
-          description: index === 0 ? "Audio Original (VO)" : "Audio em Portugues (PT-PT)"
+          description: index === 0 ? "🌍 Audio Original (VO)\n🌐 Fonte: https://tugaflix.best" : "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://tugaflix.best"
         });
       }
     } catch (error) {
