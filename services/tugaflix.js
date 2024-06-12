@@ -1,6 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const { fetchIMDBByID: fetchIMDB } = require('./imdb');
+const { normalizeStrings } = require('../utils/strings');
 const SteamtapeGetDlLink = require('./steamtape');
 
 function formatNumberInString(str) {
@@ -111,16 +112,6 @@ async function fetchSeriesIframeSrc(playerURl) {
   } catch (error) {
 
   }
-}
-
-function normalizeStrings(strings) {
-  return strings.map(str => {
-    // Remover acentos
-    const withoutAccents = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const withoutSpaces = withoutAccents.replace(/\s+/g, '-').toLowerCase();
-
-    return withoutSpaces.replace(':', '')
-  });
 }
 
 async function moviesFetch(imdbId) {

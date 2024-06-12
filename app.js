@@ -5,20 +5,20 @@ const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
-  version: '1.1.0',
+  version: '1.1.1',
   name: 'TugaPlay',
-  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros.',
+  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Suporte-me livremente: https://coindrop.to/vitorh_asilva',
+  contactEmail: 'vitorsilva10413@gmail.com',
   logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
   catalogs: [{
     type: 'movie',
     id: 'tugakids',
-    name: 'TugaKids',
+    name: 'Adicionados Recentemente - TugaKids',
   }],
   resources: ['stream', 'catalog'],
   types: ['movie', 'series'],
   idPrefixes: ['tt']
 })
-
 
 
 builder.defineStreamHandler(async function (args) {
@@ -39,10 +39,8 @@ builder.defineStreamHandler(async function (args) {
 
 builder.defineCatalogHandler(async function (args) {
   let existingCatalogs = [];
-  console.log(args)
   if (args.type === 'movie') {
     existingCatalogs = existingCatalogs.concat(await TugaKidsCatalog(args.type, args.id))
-    console.log(existingCatalogs)
     return Promise.resolve({ metas: existingCatalogs })
   } else {
     return Promise.resolve({ metas: [] })
