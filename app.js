@@ -6,17 +6,16 @@ const { OTFTStream } = require('./services/osteusfilmestuga')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'dev' ? 'developer' : 'stream'}`,
-  version: '1.1.5',
+  version: '1.2.0',
   name: 'TugaPlay',
-  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Suporte-me livremente: https://coindrop.to/vitorh_asilva',
-  contactEmail: 'vitorsilva10413@gmail.com',
+  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Ajude-me livremente: https://coindrop.to/vitorh_asilva',
   logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
-  catalogs: [{
+  catalogs: [/* {
     type: 'movie',
     id: 'tugakids',
     name: 'Adicionados Recentemente - TugaKids',
-  }],
-  resources: ['stream', 'catalog'],
+  } */],
+  resources: ['stream', /* 'catalog' */],
   types: ['movie', 'series'],
   idPrefixes: ['tt']
 })
@@ -40,6 +39,7 @@ builder.defineStreamHandler(async function (args) {
       streams: existingStreams
     })
   } else if (args.type === 'series') {
+    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id))
     // existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
     onlineUsers--;
     return Promise.resolve({ streams: existingStreams })
@@ -49,7 +49,7 @@ builder.defineStreamHandler(async function (args) {
   }
 })
 
-builder.defineCatalogHandler(async function (args) {
+/* builder.defineCatalogHandler(async function (args) {
 
   let existingCatalogs = [];
   if (args.type === 'movie') {
@@ -59,7 +59,7 @@ builder.defineCatalogHandler(async function (args) {
     return Promise.resolve({ metas: [] })
   }
 
-})
+}) */
 
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })

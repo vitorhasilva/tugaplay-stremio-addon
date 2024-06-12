@@ -1,9 +1,9 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { fetchIMDBByID: fetchIMDB } = require('./imdb');
+const { fetchIMDBByID } = require('./imdb');
 const { normalizeStrings } = require('../utils/strings');
 
-async function fetchMoviesPlayer(url) {
+async function fetchPlayer(url) {
   try {
     const res = await axios.get(url);
 
@@ -73,15 +73,43 @@ async function fetchM3u8Src(playerURl) {
 
 async function moviesFetch(imdbId) {
 
-  const { title, year } = await fetchIMDB(imdbId);
+  const { title, year } = await fetchIMDBByID(imdbId);
   const normalize = normalizeStrings(title);
 
-  let postId = await fetchMoviesPlayer(`https://osteusfilmestuga.online/filmes/${normalize[0]}/`);
+  let postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[0]}/`);
   let urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
 
-  if (!urlAsnwish) {
-    postId = await fetchMoviesPlayer(`https://osteusfilmestuga.online/filmes/${normalize[1]}/`);
+  if (!urlAsnwish && normalize[1]) {
+    postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[1]}/`);
     urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+  }
+
+  if (urlAsnwish) {
+    const m3u9 = await fetchM3u8Src(urlAsnwish)
+
+    return [{
+      name: 'Os Teus Filmes Tuga',
+      url: m3u9,
+      description: "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://osteusfilmestuga.online"
+    }];
+  } else {
+    return []
+  }
+
+};
+
+async function seriesFetch(imdbId) {
+
+  const [id, season, episode] = imdbId.split(':')
+  const { title } = await fetchIMDBByID(id);
+  const normalize = normalizeStrings(title);
+
+  let postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[0]}-${season}-x-${episode}/`);
+
+  let urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
+  if (!urlAsnwish && normalize[1]) {
+    postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[1]}-${season}-x-${episode}/`);
+    urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
   }
 
   if (urlAsnwish) {
