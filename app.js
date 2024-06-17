@@ -5,15 +5,15 @@ const { OTFTStream } = require('./services/osteusfilmestuga')
 // const TugaFlix = require('./services/tugaflix')
 
 const builder = new addonBuilder({
-  id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'stream'}`,
-  version: '1.2.4',
-  name: 'TugaPlay',
-  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Ajude-me livremente: https://coindrop.to/vitorh_asilva',
-  logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
+  id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'premium'}`,
+  version: '1.3.0',
+  name: 'TugaPlay Premium',
+  description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Esta é uma versão Premium!',
+  logo: 'https://i.ibb.co/JjFByHZ/Tuga-Stream-1.png',
   catalogs: [{
     type: 'movie',
     id: 'tugakids',
-    name: 'Adicionados Recentemente - TugaKids',
+    name: 'TugaKids',
   }],
   resources: ['stream', 'catalog'],
   types: ['movie', 'series'],
