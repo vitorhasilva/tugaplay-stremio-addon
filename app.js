@@ -65,6 +65,6 @@ builder.defineCatalogHandler(async function (args) {
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 
 setInterval(() => {
-  https.get('https://tugaplay.onrender.com/manifest.json')
-  console.log(`🧮 Total Users ${totalUsers}`);
+  https.get('https://tugaplay-addon.onrender.com/manifest.json')
+  // console.log(`🧮 Total Users ${totalUsers}`);
 }, 1000 * 60)
