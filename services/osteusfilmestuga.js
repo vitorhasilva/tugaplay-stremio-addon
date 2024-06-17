@@ -90,7 +90,7 @@ async function moviesFetch(imdbId) {
 
       const differenceInDays = (currentDate - updatedAt) / (1000 * 60 * 60 * 24);
 
-      if (differenceInDays > 3) {
+      if (differenceInDays > 7) {
         const { title, year } = await fetchIMDBByID(imdbId);
         const normalize = normalizeStrings(title);
 
@@ -145,17 +145,57 @@ async function moviesFetch(imdbId) {
 };
 
 async function seriesFetch(imdbId) {
+  const result = await db('osteusfilmestuga').where({ imdbId }).first();
+  let urlAsnwish
 
-  const [id, season, episode] = imdbId.split(':')
-  const { title } = await fetchIMDBByID(id);
-  const normalize = normalizeStrings(title);
+  if (result) {
+    if (result.srcWish !== null) {
+      urlAsnwish = result.srcWish;
+    }
+    else {
+      const updatedAt = new Date(result.updatedAt);
+      const currentDate = new Date();
 
-  let postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[0]}-${season}-x-${episode}/`);
+      const differenceInDays = (currentDate - updatedAt) / (1000 * 60 * 60 * 24);
 
-  let urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
-  if (!urlAsnwish && normalize[1]) {
-    postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[1]}-${season}-x-${episode}/`);
+      if (differenceInDays > 7) {
+        const [id, season, episode] = imdbId.split(':')
+        const { title, year } = await fetchIMDBByID(imdbId);
+        const normalize = normalizeStrings(title);
+
+        let postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[0]}-${season}-x-${episode}/`);
+        urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
+
+        if (!urlAsnwish && normalize[1]) {
+          let postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[0]}-${season}-x-${episode}/`);
+          urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
+        }
+
+        await db('osteusfilmestuga').update({ srcWish: urlAsnwish ? urlAsnwish : null, updatedAt: currentDate }).where({ imdbId })
+
+      } else {
+        urlAsnwish = undefined;
+      }
+
+    }
+  } else {
+    const [id, season, episode] = imdbId.split(':')
+    const { title } = await fetchIMDBByID(id);
+    const normalize = normalizeStrings(title);
+
+    let postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[0]}-${season}-x-${episode}/`);
+
     urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
+    if (!urlAsnwish && normalize[1]) {
+      postId = await fetchPlayer(`https://osteusfilmestuga.online/episodios/${normalize[1]}-${season}-x-${episode}/`);
+      urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
+    }
+
+    if (urlAsnwish) {
+      await db('osteusfilmestuga').insert({ imdbId, srcWish: urlAsnwish })
+    } else {
+      await db('osteusfilmestuga').insert({ imdbId, srcWish: null })
+    }
   }
 
   if (urlAsnwish) {
