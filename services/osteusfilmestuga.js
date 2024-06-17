@@ -1,7 +1,12 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const knex = require('knex');
 const { fetchIMDBByID } = require('./imdb');
 const { normalizeStrings } = require('../utils/strings');
+const knexFile = require('../knexfile');
+
+const db = knex(knexFile[process.env.NODE_ENV]);
+
 
 async function fetchPlayer(url) {
   try {
@@ -73,15 +78,56 @@ async function fetchM3u8Src(playerURl) {
 
 async function moviesFetch(imdbId) {
 
-  const { title, year } = await fetchIMDBByID(imdbId);
-  const normalize = normalizeStrings(title);
+  const result = await db('osteusfilmestuga').where({ imdbId }).first();
+  let urlAsnwish
+  if (result) {
+    if (result.srcWish !== null) {
+      urlAsnwish = result.srcWish;
+    }
+    else {
+      const updatedAt = new Date(result.updatedAt);
+      const currentDate = new Date();
 
-  let postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[0]}/`);
-  let urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+      const differenceInDays = (currentDate - updatedAt) / (1000 * 60 * 60 * 24);
 
-  if (!urlAsnwish && normalize[1]) {
-    postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[1]}/`);
+      if (differenceInDays > 3) {
+        const { title, year } = await fetchIMDBByID(imdbId);
+        const normalize = normalizeStrings(title);
+
+        let postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[0]}/`);
+        urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+
+        if (!urlAsnwish && normalize[1]) {
+          postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[1]}/`);
+          urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+        }
+
+        await db('osteusfilmestuga').update({ srcWish: urlAsnwish ? urlAsnwish : null, updatedAt: currentDate }).where({ imdbId })
+
+      } else {
+        urlAsnwish = undefined;
+      }
+
+    }
+
+  } else {
+    const { title, year } = await fetchIMDBByID(imdbId);
+    const normalize = normalizeStrings(title);
+
+    let postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[0]}/`);
     urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+
+    if (!urlAsnwish && normalize[1]) {
+      postId = await fetchPlayer(`https://osteusfilmestuga.online/filmes/${normalize[1]}/`);
+      urlAsnwish = await fetchWpAdmin(postId, 2, 'movie')
+    }
+
+
+    if (urlAsnwish) {
+      await db('osteusfilmestuga').insert({ imdbId, srcWish: urlAsnwish })
+    } else {
+      await db('osteusfilmestuga').insert({ imdbId, srcWish: null })
+    }
   }
 
   if (urlAsnwish) {
