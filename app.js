@@ -6,7 +6,7 @@ const { OTFTStream } = require('./services/osteusfilmestuga')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'stream'}`,
-  version: '1.2.2',
+  version: '1.2.3',
   name: 'TugaPlay',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Ajude-me livremente: https://coindrop.to/vitorh_asilva',
   logo: 'https://i.ibb.co/19byyxs/Tuga-Stream.png',
@@ -66,6 +66,5 @@ serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 
 setInterval(() => {
   https.get('https://tugaplay.onrender.com/manifest.json')
-  totalUsers--;
   console.log(`🧮 Total Users ${totalUsers}`);
 }, 1000 * 60)

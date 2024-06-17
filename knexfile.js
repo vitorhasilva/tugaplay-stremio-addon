@@ -7,7 +7,7 @@ module.exports = {
 
   development: {
     client: 'postgresql',
-    connection: process.env.DB_URL,
+    connection: 'postgres://lymfpgtx:hPorgD6ySRDBJ8eSxb6bjzq9YBxoJrR4@flora.db.elephantsql.com/lymfpgtx?ssl',
     debug: false,
     pool: {
       min: 0,
