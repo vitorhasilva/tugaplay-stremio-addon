@@ -14,7 +14,7 @@ async function fetchPlayer(title) {
 
     const postId = Object.keys(res.data)[0]
     const url = res.data[postId].url;
-    console.log('%cservices\osteusfilmestuga.js:17 postId', 'color: #007acc;', postId, url);
+
     if (postId === 'error') {
       return undefined
     } else {
@@ -195,7 +195,7 @@ async function seriesFetch(imdbId) {
         }
 
         if (!urlAsnwish && postIdExist) {
-          console.log('%cservices\osteusfilmestuga.js:201 ', 'color: #007acc;', postIdExist.url.split('/').pop());
+
           let postId = await fetchPlayerSeries(`https://osteusfilmestuga.online/episodios/${postIdExist.url.split('/').pop()}-${season}-x-${episode}/`);
           urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
           if (!urlAsnwish) {
@@ -231,7 +231,7 @@ async function seriesFetch(imdbId) {
     }
 
     if (!urlAsnwish && postIdExist) {
-      console.log('%cservices\osteusfilmestuga.js:201 ', 'color: #007acc;', postIdExist.url.split('/').pop());
+
       let postId = await fetchPlayerSeries(`https://osteusfilmestuga.online/episodios/${postIdExist.url.split('/').pop()}-${season}-x-${episode}/`);
       urlAsnwish = await fetchWpAdmin(postId, 2, 'tv')
       if (!urlAsnwish) {
