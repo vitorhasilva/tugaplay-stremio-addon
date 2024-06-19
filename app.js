@@ -6,7 +6,7 @@ const { OTFTStream } = require('./services/osteusfilmestuga')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'premium'}`,
-  version: '1.3.0',
+  version: '1.3.3',
   name: 'TugaPlay Premium',
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Esta é uma versão Premium!',
   logo: 'https://i.ibb.co/JjFByHZ/Tuga-Stream-1.png',
