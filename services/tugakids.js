@@ -1,5 +1,10 @@
 const axios = require('axios')
 const cheerio = require('cheerio');
+const knex = require('knex');
+const knexFile = require('../knexfile');
+var cron = require('node-cron');
+
+const db = knex(knexFile[process.env.NODE_ENV]);
 
 async function checkExists(id) {
   try {
@@ -37,38 +42,56 @@ const TugaKidsStream = async (type, id) => {
 
 }
 
-async function fetchTugaKids() {
+cron.schedule('0 0 * * *', async () => {
   let page = 1;
   const titles = [];
   try {
+    // Obter todos os IDs existentes da base de dados de uma vez
+    const existingIds = await db('catalogo_tugakids').pluck('id');
+
     while (true) {
       const res = await axios.post(`https://www.tugakids.com/${page !== 1 ? `page/${page}/` : ''}`);
       if (res.status === 200) {
         const html = res.data;
         const $ = cheerio.load(html);
-        $('.items .post li').each((index, element) => {
+        const items = $('.items .post li');
+
+        for (let i = 0; i < items.length; i++) {
+          const element = items[i];
           const title = $(element).find('h2').text().trim();
           const imageSrc = $(element).find('img').attr('src');
-          const imdbID = 'tt' + imageSrc.split('/')[7].split('.')[0]
-          titles.push({
-            id: imdbID,
-            name: title,
-            type: 'movie',
-            poster: imageSrc,
-            posterShape: 'poster'
-          });
-        });
+          const imdbID = 'tt' + imageSrc.split('/')[7].split('.')[0];
+
+          // Verificar se o ID já existe na lista obtida
+          if (!existingIds.includes(imdbID)) {
+            titles.push({
+              id: imdbID,
+              name: title,
+              type: 'movie',
+              poster: imageSrc,
+              posterShape: 'poster'
+            });
+          }
+        }
+
         page += 1;
       }
     }
   } catch (error) {
-    return titles;
+    if (titles.length > 0) {
+      await db('catalogo_tugakids').insert(titles);
+    }
   }
-}
+}, {
+  scheduled: true,
+  timezone: 'Europe/Lisbon'
+});
+
+
 
 const TugaKidsCatalog = async (type, id) => {
   if (type === 'movie' && id === 'tugakids') {
-    return await fetchTugaKids();
+    return await db('catalogo_tugakids').select(["id", "name", "type", "poster", "posterShape"]).orderBy('addedAt', 'desc');
   } else {
     return []
   }
