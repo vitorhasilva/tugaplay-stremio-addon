@@ -1,8 +1,10 @@
 const axios = require('axios')
 const cheerio = require('cheerio');
 const knex = require('knex');
+const cron = require('node-cron');
+const { sendEmailWithNewMovies } = require('../utils/mailer');
 const knexFile = require('../knexfile');
-var cron = require('node-cron');
+
 
 const db = knex(knexFile[process.env.NODE_ENV]);
 
@@ -79,7 +81,8 @@ cron.schedule('0 0 * * *', async () => {
     }
   } catch (error) {
     if (titles.length > 0) {
-      await db('catalogo_tugakids').insert(titles);
+      await db('catalogo_tugakids').insert(titles.reverse());
+      sendEmailWithNewMovies(titles);
     }
   }
 }, {
@@ -91,7 +94,7 @@ cron.schedule('0 0 * * *', async () => {
 
 const TugaKidsCatalog = async (type, id) => {
   if (type === 'movie' && id === 'tugakids') {
-    return await db('catalogo_tugakids').select(["id", "name", "type", "poster", "posterShape"]).orderBy('addedAt', 'desc');
+    return (await db('catalogo_tugakids').select(["id", "name", "type", "poster", "posterShape"]).orderBy('order', 'desc'));
   } else {
     return []
   }

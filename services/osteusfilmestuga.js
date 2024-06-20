@@ -93,7 +93,7 @@ async function fetchM3u8Src(playerURl) {
 }
 
 async function moviesFetch(imdbId) {
-
+  //TODO: Otimizar os filmes aqui
   const result = await db('osteusfilmestuga').where({ imdbId }).first();
   let urlAsnwish
   if (result) {
