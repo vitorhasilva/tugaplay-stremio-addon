@@ -7,8 +7,8 @@ const { OTFTStream } = require('./services/osteusfilmestuga')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'premium'}`,
-  version: '1.3.5',
-  name: 'TugaPlay Premium',
+  version: '1.3.6',
+  name: `TugaPlay Premium - ${process.env.NODE_ENV === 'development' ? 'Local' : ''}`,
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Esta é uma versão Premium!',
   logo: 'https://i.ibb.co/JjFByHZ/Tuga-Stream-1.png',
   catalogs: [{
@@ -56,6 +56,6 @@ builder.defineCatalogHandler(async function (args) {
 
 serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
 
-setInterval(() => {
+/* setInterval(() => {
   https.get('https://tugaplay-addon.onrender.com/manifest.json')
-}, 1000 * 60)
+}, 1000 * 60) */

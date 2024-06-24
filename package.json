@@ -1,6 +1,6 @@
 {
   "name": "tugaplay-stremio-addon",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Suporte-me livremente: https://coindrop.to/vitorh_asilva",
   "main": "app.js",
   "license": "MIT",

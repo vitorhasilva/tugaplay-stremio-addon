@@ -81,7 +81,7 @@ cron.schedule('0 0 * * *', async () => {
     }
   } catch (error) {
     if (titles.length > 0) {
-      await db('catalogo_tugakids').insert(titles.reverse());
+      await db('catalogo_tugakids').insert(titles.slice().reverse());
       sendEmailWithNewMovies(titles);
     }
   }
