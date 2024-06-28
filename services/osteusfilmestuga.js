@@ -148,8 +148,9 @@ async function moviesFetch(imdbId) {
       const m3u8 = await fetchM3u8Src(urlAsnwish);
       return {
         name: 'Os Teus Filmes Tuga',
-        url: m3u8,
-        description: `🌍 Áudio em Português (PT-PT)\n🌐 Fonte: https://osteusfilmestuga.online${idx === 1 ? '\n🎞️ Alternativo' : ''}`
+        url: idx === 1 ? undefined : m3u8,
+        externalUrl: idx === 1 ? urlAsnwish : undefined,
+        description: `🌍 Áudio em Português (PT-PT)\n🌐 Fonte: https://osteusfilmestuga.online${idx === 1 ? '\n🔗 URL Externo' : ''}`
       };
     });
     return await Promise.all(m3u8Promises);
@@ -209,8 +210,9 @@ async function seriesFetch(imdbId) {
       const m3u8 = await fetchM3u8Src(urlAsnwish);
       return {
         name: 'Os Teus Filmes Tuga',
-        url: m3u8,
-        description: `🌍 Áudio em Português (PT-PT)\n🌐 Fonte: https://osteusfilmestuga.online${idx === 1 ? '\n🎞️ Alternativo' : ''}`
+        url: idx === 1 ? undefined : m3u8,
+        externalUrl: idx === 1 ? urlAsnwish : undefined,
+        description: `🌍 Áudio em Português (PT-PT)\n🌐 Fonte: https://osteusfilmestuga.online${idx === 1 ? '\n🔗 URL Externo' : ''}`
       };
     });
 
