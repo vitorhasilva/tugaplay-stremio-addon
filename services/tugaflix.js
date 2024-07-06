@@ -1,6 +1,8 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const knex = require('knex');
+const url = require('url');
+const { v4: uuidv4 } = require('uuid');
 const { fetchIMDBByID: fetchIMDB } = require('./imdb');
 const { normalizeStrings } = require('../utils/strings');
 const SteamtapeGetDlLink = require('./steamtape');
@@ -75,9 +77,18 @@ async function fetchMoviesIframeSrc(playerURl) {
       // Encontrar o primeiro elemento iframe e obter o src
       const iframeElement = $('iframe').first();
       const src = iframeElement.attr('src');
-      const srcParts = src.split('?');
+      const parsedUrl = new url.URL(src);
+      const subtitlesUrl = parsedUrl.searchParams.get('c1_file');
       if (src) {
-        return srcParts[0];
+        return {
+          player: src.replace(/\n/g, ''),
+          sub: subtitlesUrl || null
+        };
+      } else {
+        return {
+          player: undefined,
+          sub: subtitlesUrl || null
+        };
       }
     }
   } catch (error) {
@@ -96,9 +107,19 @@ async function fetchSeriesIframeSrc(playerURl) {
       // Encontrar o primeiro elemento iframe e obter o src
       const iframeElement = $('iframe').first();
       const src = iframeElement.attr('src');
-      const srcParts = src.split('?');
+      const parsedUrl = new url.URL(src);
+      const subtitlesUrl = parsedUrl.searchParams.get('c1_file');
+
       if (src) {
-        return srcParts[0];
+        return {
+          player: src.replace(/\n/g, ''),
+          sub: subtitlesUrl || null
+        };
+      } else {
+        return {
+          player: undefined,
+          sub: subtitlesUrl || null
+        };
       }
     }
   } catch (error) {
@@ -108,13 +129,14 @@ async function fetchSeriesIframeSrc(playerURl) {
 
 async function moviesFetch(imdbId) {
   const result = await db('tugaflix').where({ imdbId }).first();
-  let urlsSteamtape = { srcA: undefined, srcB: undefined };
+  let urlsSteamtape = { srcA: undefined, srcB: undefined, subtitle: undefined };
   const currentDate = new Date();
 
   if (result) {
     if (result.srcA !== null || result.srcB !== null) {
       urlsSteamtape.srcA = result.srcA;
       urlsSteamtape.srcB = result.srcB;
+      urlsSteamtape.subtitle = undefined;
     } else {
       const updatedAt = new Date(result.updatedAt);
 
@@ -125,6 +147,7 @@ async function moviesFetch(imdbId) {
         await db('tugaflix').update({
           srcA: urlsSteamtape.srcA ? urlsSteamtape.srcA : null,
           srcB: urlsSteamtape.srcB ? urlsSteamtape.srcB : null,
+          subtitle: urlsSteamtape.subtitle ? urlsSteamtape.subtitle : null,
           updatedAt: currentDate
         }).where({ imdbId });
       }
@@ -135,6 +158,7 @@ async function moviesFetch(imdbId) {
       imdbId,
       srcA: urlsSteamtape.srcA ? urlsSteamtape.srcA : null,
       srcB: urlsSteamtape.srcB ? urlsSteamtape.srcB : null,
+      subtitle: urlsSteamtape.subtitle ? urlsSteamtape.subtitle : null,
     });
   }
 
@@ -143,10 +167,14 @@ async function moviesFetch(imdbId) {
   if (urlsToFetch.length > 0) {
     const m3u8Promises = urlsToFetch.map(async (urlSteamtape, idx) => {
       // const m3u8 = await SteamtapeGetDlLink(urlSteamtape);
-      return {
-        name: idx === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (VP)",
-        externalUrl: urlSteamtape,
-        description: idx === 0 ? "🌍 Audio Original (VO)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo" : "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo"
+      if (urlSteamtape !== null) {
+        const parsedUrl = new url.URL(urlSteamtape);
+        if (parsedUrl.hostname !== 'tugaflix.org')
+          return {
+            name: idx === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (VP)",
+            externalUrl: urlSteamtape,
+            description: idx === 0 ? "🌍 Audio Original (VO)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo" : "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo"
+          };
       };
     });
     return await Promise.all(m3u8Promises);
@@ -158,13 +186,14 @@ async function moviesFetch(imdbId) {
 
 async function seriesFetch(imdbId) {
   const result = await db('tugaflix').where({ imdbId }).first();
-  let urlsSteamtape = { srcA: undefined, srcB: undefined };
+  let urlsSteamtape = { srcA: undefined, srcB: undefined, subtitle: undefined };
   const currentDate = new Date();
 
   if (result) {
     if (result.srcA !== null || result.srcB !== null) {
       urlsSteamtape.srcA = result.srcA;
       urlsSteamtape.srcB = result.srcB;
+      urlsSteamtape.subtitle = undefined;
     } else {
       const updatedAt = new Date(result.updatedAt);
 
@@ -175,6 +204,7 @@ async function seriesFetch(imdbId) {
         await db('tugaflix').update({
           srcA: urlsSteamtape.srcA ? urlsSteamtape.srcA : null,
           srcB: urlsSteamtape.srcB ? urlsSteamtape.srcB : null,
+          subtitle: urlsSteamtape.subtitle ? urlsSteamtape.subtitle : null,
           updatedAt: currentDate
         }).where({ imdbId });
       }
@@ -185,6 +215,7 @@ async function seriesFetch(imdbId) {
       imdbId,
       srcA: urlsSteamtape.srcA ? urlsSteamtape.srcA : null,
       srcB: urlsSteamtape.srcB ? urlsSteamtape.srcB : null,
+      subtitle: urlsSteamtape.subtitle ? urlsSteamtape.subtitle : null,
     });
   }
 
@@ -193,11 +224,16 @@ async function seriesFetch(imdbId) {
   if (urlsToFetch.length > 0) {
     const m3u8Promises = urlsToFetch.map(async (urlSteamtape, idx) => {
       // const m3u8 = await SteamtapeGetDlLink(urlSteamtape);
-      return {
-        name: idx === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (VP)",
-        externalUrl: urlSteamtape,
-        description: idx === 0 ? "🌍 Audio Original (VO)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo" : "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo"
-      };
+      if (urlSteamtape !== null) {
+        const parsedUrl = new url.URL(urlSteamtape);
+        if (parsedUrl.hostname !== 'tugaflix.org')
+          return {
+            name: idx === 0 ? 'Tugaflix.best (VO)' : "Tugaflix.best (VP)",
+            externalUrl: urlSteamtape,
+            description: idx === 0 ? "🌍 Audio Original (VO)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo" : "🌍 Audio em Portugues (PT-PT)\n🌐 Fonte: https://tugaflix.best\n🔗 URL Externo"
+          };
+      }
+
     });
     return await Promise.all(m3u8Promises);
   } else {
@@ -213,12 +249,16 @@ async function updateUrlsMovies(imdbId) {
   const PlayerLink = async (index) => {
     const urlPlayer = await fetchMoviesPlayer(`https://tugaflix.best/filmes/${normalize[index]}-${year}/`);
     const urlSteamtape = await fetchMoviesIframeSrc(urlPlayer);
-    return urlSteamtape ? urlSteamtape.replace(/\n/g, '') : undefined;
+    return urlSteamtape;
   }
 
+  const srcOV = await PlayerLink(0);
+  const srcVP = await PlayerLink(1);
+
   urlsSteamtape = {
-    srcA: await PlayerLink(0),
-    srcB: await PlayerLink(1)
+    srcA: srcOV ? srcOV.player : undefined,
+    srcB: srcVP ? srcVP.player : undefined,
+    subtitle: srcOV ? srcOV.sub : undefined,
   };
 
   return urlsSteamtape;
@@ -233,22 +273,47 @@ async function updateUrlsSeries(imdbId) {
   const PlayerLink = async (index) => {
     const urlPlayer = await fetchSeriesPlayer(`https://tugaflix.best/series/${normalize[index]}/`, season, episode);
     const urlSteamtape = await fetchSeriesIframeSrc(urlPlayer);
-    return urlSteamtape ? urlSteamtape.replace(/\n/g, '') : undefined;
+    return urlSteamtape;
   }
 
+  const srcOV = await PlayerLink(0);
+  const srcVP = await PlayerLink(1);
+
   urlsSteamtape = {
-    srcA: await PlayerLink(0),
-    srcB: await PlayerLink(1)
+    srcA: srcOV ? srcOV.player : undefined,
+    srcB: srcVP ? srcVP.player : undefined,
+    subtitle: srcOV ? srcOV.sub : undefined,
   };
 
   return urlsSteamtape;
 }
 
-module.exports = async (type, id) => {
+const TugaFlixStream = async (type, id) => {
   if (type === 'movie') {
     return await moviesFetch(id);
   } else if (type === 'series') {
     return await seriesFetch(id);
   } else
     return undefined;
+}
+
+const TugaFlixSubtitle = async (type, id) => {
+  const result = await db('tugaflix').where({ imdbId: id }).first('subtitle');
+  if (result) {
+    return [
+      {
+        id: uuidv4(),
+        url: result.subtitle,
+        lang: 'por'
+      }
+    ]
+  } else {
+    return [];
+  }
+
+}
+
+module.exports = {
+  TugaFlixStream,
+  TugaFlixSubtitle
 }
