@@ -6,8 +6,8 @@ const { TugaFlixStream, TugaFlixSubtitle } = require('./services/tugaflix')
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'premium'}`,
-  version: '1.4.0',
-  name: `TugaPlay Premium - ${process.env.NODE_ENV === 'development' ? 'Local' : ''}`,
+  version: '1.4.1',
+  name: `TugaPlay Premium${process.env.NODE_ENV === 'development' ? ' - Local' : ''}`,
   description: 'Aceda a uma variedade de filmes e séries, reunidos de diversos serviços de terceiros. Esta é uma versão Premium!',
   logo: 'https://i.ibb.co/JjFByHZ/Tuga-Stream-1.png',
   catalogs: [{
