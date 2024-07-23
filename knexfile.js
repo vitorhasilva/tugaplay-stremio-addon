@@ -5,7 +5,7 @@
  */
 module.exports = {
 
-  development: {
+  local: {
     client: 'postgresql',
     connection: process.env.DB_URL,
     debug: false,
@@ -18,7 +18,7 @@ module.exports = {
     },
   },
 
-  staging: {
+  online: {
     client: 'postgresql',
     connection: process.env.DB_URL,
     debug: false,

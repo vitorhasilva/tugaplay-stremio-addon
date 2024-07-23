@@ -1,6 +1,20 @@
 const axios = require('axios');
 
-const sendLogToDiscord = (id, level, message, version) => {
+const webhookUrl = 'https://discord.com/api/webhooks/1265297459903594607/ez_0uLkZGVlxw4NA-DCSAikePWCgN44hc12tzKyGEUyZys_s1HvqzaC1a3s3mD6hnLLe';
+
+const sendLogToDiscord = (level, logMessage, version) => {
+  let id;
+  let message;
+
+  const split = logMessage.match(/\{\{\$\{([^}]+)\}\}\}(.+)/);
+  if (split) {
+    const [splitId, splitMessage] = split;
+    id = splitId;
+    message = splitMessage;
+  } else {
+    id = 'null';
+    message = logMessage;
+  }
   const embed = {
     title: `Log - ${level.toUpperCase()}`,
     description: message,

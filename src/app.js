@@ -5,6 +5,7 @@ const consign = require('consign');
 const winston = require('winston');
 const { v4: uuidv4 } = require('uuid');
 const knex = require('knex');
+const { sendLogToDiscord } = require('./utils/discord');
 
 const knexfile = require('../knexfile');
 
@@ -26,6 +27,14 @@ app.logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.json({ space: 1 }),
     }),
+    new winston.transports.Stream({
+      stream: {
+        write: (message) => {
+          const log = JSON.parse(message);
+          sendLogToDiscord(log.level, log.message);
+        },
+      },
+    }),
   ],
 });
 
@@ -39,7 +48,7 @@ app.use(({
     if (name === 'validationError') res.status(400).json({ error: message, fields });
     else {
       const id = uuidv4();
-      app.logger.error(`${id}:${name}\n${message}\n${stack}`);
+      app.logger.error(`{{${id}}}${name}\n${message}\n${stack}`);
       res.status(500).json({ id, error: `Ocorreu um erro interno no servidor. Por favor, entre em contacto com o suporte técnico e forneça o seguinte id: ${id}` });
     }
   } catch (err) {
