@@ -1,32 +1,20 @@
 const axios = require('axios');
+const TransportStream = require('winston-transport');
+const packageJson = require('../../package.json');
 
-const webhookUrl = 'https://discord.com/api/webhooks/1265297459903594607/ez_0uLkZGVlxw4NA-DCSAikePWCgN44hc12tzKyGEUyZys_s1HvqzaC1a3s3mD6hnLLe';
+const webhookUrl = process.env.DISCORD_WEBHOOK;
 
-const sendLogToDiscord = (level, logMessage, version) => {
-  let id;
-  let message;
+const sendLogToDiscord = (level, logMessage) => {
+  const split = logMessage.split('->');
 
-  const split = logMessage.match(/\{\{\$\{([^}]+)\}\}\}(.+)/);
-  if (split) {
-    const [splitId, splitMessage] = split;
-    id = splitId;
-    message = splitMessage;
-  } else {
-    id = 'null';
-    message = logMessage;
-  }
   const embed = {
     title: `Log - ${level.toUpperCase()}`,
-    description: message,
+    description: '',
     color: level === 'error' ? 15158332 : 3447003,
     fields: [
       {
-        name: 'Id',
-        value: id,
-      },
-      {
         name: 'Message',
-        value: message,
+        value: split[split.length > 1 ? 1 : 0],
       },
       {
         name: 'Timestamp',
@@ -34,10 +22,20 @@ const sendLogToDiscord = (level, logMessage, version) => {
       },
     ],
     footer: {
-      text: `TugaPlay • v${version}`,
+      text: `TugaPlay • v${packageJson.version}`,
       icon_url: 'https://i.ibb.co/JjFByHZ/Tuga-Stream-Premium.png',
     },
   };
+
+  if (split.length > 1) {
+    embed.fields = [
+      {
+        name: 'ID',
+        value: split[0],
+      },
+      ...embed.fields,
+    ];
+  }
 
   axios.post(webhookUrl, {
     username: 'TugaPlay',
@@ -48,6 +46,23 @@ const sendLogToDiscord = (level, logMessage, version) => {
   });
 };
 
+class DiscordTransport extends TransportStream {
+  // eslint-disable-next-line no-useless-constructor
+  constructor(opts) {
+    super(opts);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  log(info, callback) {
+    const { level, message } = info;
+
+    sendLogToDiscord(level, message);
+
+    callback();
+  }
+}
+
 module.exports = {
   sendLogToDiscord,
+  DiscordTransport,
 };

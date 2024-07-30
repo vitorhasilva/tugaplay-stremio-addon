@@ -1,8 +1,8 @@
-require('dotenv').config()
-const { addonBuilder, serveHTTP } = require('stremio-addon-sdk')
-const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids')
-const { OTFTStream } = require('./services/osteusfilmestuga')
-const TugaFlix = require('./services/tugaflix')
+require('dotenv').config();
+const { addonBuilder, serveHTTP } = require('stremio-addon-sdk');
+const { TugaKidsCatalog, TugaKidsStream } = require('./services/tugakids');
+const { OTFTStream } = require('./services/osteusfilmestuga');
+const TugaFlix = require('./services/tugaflix');
 
 const builder = new addonBuilder({
   id: `pt.tugaplay.${process.env.NODE_ENV === 'development' ? 'development' : 'premium'}`,
@@ -17,40 +17,33 @@ const builder = new addonBuilder({
   }],
   resources: ['stream', 'catalog'],
   types: ['movie', 'series'],
-  idPrefixes: ['tt']
-})
+  idPrefixes: ['tt'],
+});
 
-
-builder.defineStreamHandler(async function (args) {
-
+builder.defineStreamHandler(async (args) => {
   let existingStreams = [];
   if (args.type === 'movie') {
-    existingStreams = existingStreams.concat(await TugaKidsStream(args.type, args.id))
-    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id))
-    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
+    existingStreams = existingStreams.concat(await TugaKidsStream(args.type, args.id));
+    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id));
+    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id));
     return Promise.resolve({
-      streams: existingStreams
-    })
-  } else if (args.type === 'series') {
-    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id))
-    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id))
-    return Promise.resolve({ streams: existingStreams })
-  } else {
-    return Promise.resolve({ streams: [] })
+      streams: existingStreams,
+    });
+  } if (args.type === 'series') {
+    existingStreams = existingStreams.concat(await OTFTStream(args.type, args.id));
+    existingStreams = existingStreams.concat(await TugaFlix(args.type, args.id));
+    return Promise.resolve({ streams: existingStreams });
   }
-})
+  return Promise.resolve({ streams: [] });
+});
 
-builder.defineCatalogHandler(async function (args) {
-
+builder.defineCatalogHandler(async (args) => {
   let existingCatalogs = [];
   if (args.type === 'movie') {
-    existingCatalogs = existingCatalogs.concat(await TugaKidsCatalog(args.type, args.id))
-    return Promise.resolve({ metas: existingCatalogs })
-  } else {
-    return Promise.resolve({ metas: [] })
+    existingCatalogs = existingCatalogs.concat(await TugaKidsCatalog(args.type, args.id));
+    return Promise.resolve({ metas: existingCatalogs });
   }
+  return Promise.resolve({ metas: [] });
+});
 
-})
-
-
-serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 })
+serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 });

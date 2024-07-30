@@ -5,7 +5,7 @@ const consign = require('consign');
 const winston = require('winston');
 const { v4: uuidv4 } = require('uuid');
 const knex = require('knex');
-const { sendLogToDiscord } = require('./utils/discord');
+const { DiscordTransport } = require('./utils/discord');
 
 const knexfile = require('../knexfile');
 
@@ -17,6 +17,8 @@ app.env = process.env.NODE_ENV || 'online';
 app.addr = {
   host: process.env.IP || '127.0.0.1',
   port: process.env.PORT || 7000,
+  hostname: app.env === 'online' ? process.env.HOSTNAME || 'localhost' : 'localhost',
+  ssl: process.env.SSL === 'true',
 };
 
 app.db = knex(knexfile[app.env]);
@@ -27,18 +29,16 @@ app.logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.json({ space: 1 }),
     }),
-    new winston.transports.Stream({
-      stream: {
-        write: (message) => {
-          const log = JSON.parse(message);
-          sendLogToDiscord(log.level, log.message);
-        },
-      },
+    new DiscordTransport({
+      format: winston.format.json({ space: 1 }),
     }),
   ],
 });
 
 consign({ cwd: 'src', verbose: false })
+  .include('./config/middlewares.js')
+  .include('./routes')
+  .include('./config/router.js')
   .into(app);
 
 app.use(({
@@ -48,7 +48,7 @@ app.use(({
     if (name === 'validationError') res.status(400).json({ error: message, fields });
     else {
       const id = uuidv4();
-      app.logger.error(`{{${id}}}${name}\n${message}\n${stack}`);
+      app.logger.error(`${id}->${name}\n${message}\n${stack}`);
       res.status(500).json({ id, error: `Ocorreu um erro interno no servidor. Por favor, entre em contacto com o suporte técnico e forneça o seguinte id: ${id}` });
     }
   } catch (err) {
