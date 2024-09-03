@@ -1,7 +1,9 @@
 const router = require('express').Router();
-
+const path = require('path');
 const manifest = require('../config/manifest');
 const landingTemplate = require('../utils/landingTemplate');
+
+const rulesHtml = path.join(__dirname, '../html/rules.html');
 
 const landingHTML = landingTemplate(manifest);
 
@@ -24,6 +26,11 @@ module.exports = (/* app */) => {
   router.get('/configure', (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.status(200).send(landingHTML);
+  });
+
+  router.get('/rules', (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).sendFile(rulesHtml);
   });
 
   router.get('/:token/:resource/:type/:id', (req, res) => {

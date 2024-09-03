@@ -37,6 +37,7 @@ app.logger = winston.createLogger({
 
 consign({ cwd: 'src', verbose: false })
   .include('./config/middlewares.js')
+  .include('./services')
   .include('./routes')
   .include('./config/router.js')
   .into(app);
@@ -46,6 +47,7 @@ app.use(({
 }, req, res, next) => {
   try {
     if (name === 'validationError') res.status(400).json({ error: message, fields });
+    else if (name === 'IpDeniedError') res.status(403).json({ error: message });
     else {
       const id = uuidv4();
       app.logger.error(`${id}->${name}\n${message}\n${stack}`);
