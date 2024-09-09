@@ -53,7 +53,7 @@ module.exports = (app) => {
       template: 'account_verification',
       data: {
         logo_url: manifest.logo,
-        addon_nome: manifest.addon_nome,
+        addon_nome: manifest.name,
         user_nome: data.name,
         verificacao_url: `${app.addr.ssl === true ? 'https' : 'http'}://${app.addr.hostname}/auth/verify/${verificationToken}`,
         regras_url: `${app.addr.ssl === true ? 'https' : 'http'}://${app.addr.hostname}/rules`,

@@ -8,7 +8,6 @@ exports.up = (knex) => knex.schema.createTable('account_verifications', (table) 
     .onDelete('CASCADE')
     .comment('Foreign key referencing the users table, links the verification to a specific user');
   table.string('verification_token', 255).notNullable().comment('The token sent to the user for account verification');
-  table.boolean('is_verified').defaultTo(false).comment('Indicates whether the account has been successfully verified');
   table.timestamp('created_at').defaultTo(knex.fn.now()).comment('Timestamp indicating when the verification record was created');
 });
 

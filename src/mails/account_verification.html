@@ -4,231 +4,87 @@
 <head>
     <meta charset="UTF-8">
     <title>Confirmação de Pedido</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@2.1.0/build/pure-min.css">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body,
-        html {
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
             width: 100%;
-            min-height: 100%;
-        }
-
-        body {
-            padding: 2vh;
-            font-size: 2.2vh;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Open Sans', Arial, sans-serif;
-            color: white;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        html {
-            background-size: auto 100%;
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            box-shadow: inset 0 0 0 2000px rgb(0 0 0 / 60%);
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #dddddd;
         }
 
         h1 {
-            font-size: 4.5vh;
-            font-weight: 700;
-        }
-
-        h2 {
-            font-size: 2.2vh;
-            font-weight: normal;
-            font-style: italic;
-            opacity: 0.8;
-        }
-
-        h3 {
-            font-size: 2.2vh;
-        }
-
-        h1,
-        h2,
-        h3 {
-            margin: 0;
-            text-shadow: 0 0 1vh rgba(0, 0, 0, 0.15);
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
         p {
-            font-size: 1.75vh;
-        }
-
-        ul {
-            font-size: 1.75vh;
-            margin: 0;
-            margin-top: 1vh;
-            padding-left: 3vh;
+            margin-bottom: 10px;
         }
 
         a {
-            color: white;
+            /*text-decoration: none;*/
+            color: #000;
         }
 
-        a.install-link {
-            text-decoration: none;
-        }
-
-        a.button {
-            border: 0;
-            outline: 0;
-            color: white;
-            background: #8A5AAB;
-            padding: 1.2vh 3.5vh;
-            margin: auto;
-            text-align: center;
-            font-family: 'Open Sans', Arial, sans-serif;
-            font-size: 2.2vh;
-            font-weight: 600;
-            cursor: pointer;
-            display: block;
-            box-shadow: 0 0.5vh 1vh rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.1s ease-in-out;
-            text-decoration: none
-        }
-
-        a.button:hover {
-            box-shadow: none;
-        }
-
-        a.button:active {
-            box-shadow: 0 0 0 0.5vh white inset;
-        }
-
-        #addon {
-            width: 63vh;
-            margin: auto;
-        }
-
-        .logo {
-            height: 14vh;
-            width: 14vh;
-            margin: auto;
-            margin-bottom: 3vh;
-        }
-
-        .logo img {
-            width: 100%;
-        }
-
-        .name,
-        .version {
+        .button {
             display: inline-block;
-            vertical-align: top;
-        }
-
-        .name {
-            line-height: 5vh;
-            margin: 0;
-        }
-
-        .version {
-            position: relative;
-            line-height: 5vh;
-            opacity: 0.8;
-            margin-bottom: 2vh;
-        }
-
-        .contact {
-            width: 100%;
+            padding: 10px 20px;
+            margin-top: 20px;
             text-align: center;
-            margin-top: 2vh;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #000;
         }
 
-        .contact a {
-            font-size: 1.4vh;
-            font-style: italic;
-        }
-
-        .separator {
-            margin-bottom: 4vh;
-        }
-
-        .form-element {
-            margin-bottom: 2vh;
-        }
-
-        .label-to-top {
-            margin-bottom: 2vh;
-        }
-
-        .label-to-right {
-            margin-left: 1vh !important;
-        }
-
-        .full-width {
-            width: 100%;
-        }
-
-        .form-container {
-            padding: 2vh;
-            border-radius: 1vh;
-            margin-top: 2vh;
-        }
-
-        .form-container h2 {
+        .footer {
             text-align: center;
-            margin-bottom: 2vh;
-            background: darkslateblue;
-            padding: 10px;
-            border-radius: 25px;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777777;
         }
 
-        .pure-button-alternative {
-            background: #8c52ff;
-            color: white;
+        .logo-container,
+        .button-container {
+            text-align: center;
         }
 
-        .pure-button-secondary {
-            background: #1f253e;
-            margin-left: 1vh;
-            color: white;
-        }
-
-        .pure-button-success {
-            background: #68df64;
-        }
-
-        .pure-controls {
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1vh;
-        }
-
-        .pure-button {
-            width: 50%;
+        img {
+            max-width: 50%;
+            height: auto;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 
 <body>
-    <div id="addon">
-        <div class="logo">
-            <img src="{{logo_url}}" alt="Logo do Addon">
+    <div class="container">
+        <div class="logo-container">
+            <img src="{{logo_url}}" alt="{{addon_nome}} Logo">
         </div>
-        <h1>{{addon_nome}}</h1>
         <p>Olá {{user_nome}},</p>
         <p>Recebemos o seu pedido para usar o nosso addon.</p>
         <p>Por favor, verifique o seu email clicando no botão abaixo:</p>
-        <a class="button" href="{{verificacao_url}}">Verificar Email</a>
-        <p>As primeiras 10 pessoas que confirmarem o email terão acesso instantâneo.</p>
+        <div class="button-container">
+            <a class="button" href="{{verificacao_url}}">Verificar Email</a>
+        </div>
         <p>Ao verificar o email, você aceita as nossas regras de uso. Pode consultar as regras de uso <a
-                href="{{regras_url}}" style=>aqui</a></p>
+                href="{{regras_url}}">aqui</a></p>
+        <p style="color:lightcoral">As primeiras 10 pessoas que confirmarem o email terão acesso instantâneo.</p>
 
-        <div class="contact">
-            <p>&copy; 2024 {{addon_nome}}. Todos os direitos reservados.</p>
+
+        <div class="footer">
+            &copy; 2024 {{addon_nome}}. Todos os direitos reservados.
         </div>
     </div>
 </body>
