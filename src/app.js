@@ -5,7 +5,6 @@ const consign = require('consign');
 const winston = require('winston');
 const { v4: uuidv4 } = require('uuid');
 const knex = require('knex');
-const { DiscordTransport } = require('./utils/discord');
 
 const knexfile = require('../knexfile');
 
@@ -23,6 +22,18 @@ app.addr = {
 
 app.db = knex(knexfile[app.env]);
 
+consign({ cwd: 'src', verbose: false })
+  .include('./bot/commands.js')
+  .include('./bot/events.js')
+  .include('./bot/client.js')
+  .include('./config/middlewares.js')
+  .include('./services')
+  .include('./routes')
+  .include('./config/router.js')
+  .into(app);
+
+const { DiscordTransport } = app.bot.events;
+
 app.logger = winston.createLogger({
   level: 'debug',
   transports: [
@@ -34,13 +45,6 @@ app.logger = winston.createLogger({
     }),
   ],
 });
-
-consign({ cwd: 'src', verbose: false })
-  .include('./config/middlewares.js')
-  .include('./services')
-  .include('./routes')
-  .include('./config/router.js')
-  .into(app);
 
 app.use(({
   name, message, fields, stack,

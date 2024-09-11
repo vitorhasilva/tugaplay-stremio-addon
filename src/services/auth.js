@@ -3,7 +3,6 @@ const bcrypt = require('bcryptjs');
 // const jwt = require('jwt-simple');
 const crypto = require('crypto');
 const { ValidationError } = require('../utils/Errors');
-const { sendToDiscord } = require('../utils/discord');
 const { sendWithTemplate } = require('../utils/Mailer');
 const manifest = require('../config/manifest');
 
@@ -65,7 +64,7 @@ module.exports = (app) => {
       verification_token: verificationToken,
     });
 
-    sendToDiscord(process.env.WEBHOOK_NEW_ACCOUNT, {
+    app.bot.events.sendToDiscord(process.env.DISCORD_CH_NEW_ACCOUNT, {
       title: 'Nova Conta Criada',
       color: 'FFDE59',
       fields: [
@@ -90,7 +89,7 @@ module.exports = (app) => {
 
     await app.db('users').update({ is_verified: true }).where({ id: verification.user_id });
 
-    sendToDiscord(process.env.WEBHOOK_NEW_ACCOUNT, {
+    app.bot.events.sendToDiscord(process.env.DISCORD_CH_VERIFY_ACCOUNT, {
       title: 'Conta Verificada',
       color: '7DDA58',
       fields: [

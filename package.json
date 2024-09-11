@@ -9,8 +9,27 @@
     "email": "geral.tugaplay@gmail.com"
   },
   "scripts": {
+    "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "lint": "eslint src/**/*.js"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "verbose": true,
+    "ignore": [
+      "coverage",
+      "logs",
+      "node_modules",
+      ".vscode",
+      "test",
+      ".eslintrc.js",
+      ".gitignore",
+      "package.json",
+      "yarn.lock"
+    ],
+    "env": {
+      "NODE_ENV": "local"
+    }
   },
   "dependencies": {
     "axios": "^1.7.2",
@@ -20,6 +39,7 @@
     "consign": "^0.1.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "discord.js": "^14.16.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
@@ -42,6 +62,7 @@
   "devDependencies": {
     "eslint": "^7.32.0 || ^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2"
+    "eslint-plugin-import": "^2.25.2",
+    "nodemon": "^3.1.4"
   }
 }
