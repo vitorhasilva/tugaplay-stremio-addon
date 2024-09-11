@@ -1,10 +1,23 @@
 const router = require('express').Router();
+const path = require('path');
+
+const verifiedHtml = path.join(__dirname, '../html/verified.html');
 
 module.exports = (app) => {
   router.post('/sign-up', (req, res, next) => {
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     app.services.auth.signup(req.body, clientIp, req.headers['user-agent'])
       .then(() => res.status(201).json({ message: 'Verifique o seu email para concluir o pedido' }))
+      .catch((error) => next(error));
+  });
+
+  router.get('/verify/:token', (req, res, next) => {
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    app.services.auth.verify(req.params.token, clientIp, req.headers['user-agent'])
+      .then(() => {
+        res.setHeader('Content-Type', 'text/html');
+        res.status(200).sendFile(verifiedHtml);
+      })
       .catch((error) => next(error));
   });
 

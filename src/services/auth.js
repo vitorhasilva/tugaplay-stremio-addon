@@ -66,13 +66,14 @@ module.exports = (app) => {
     });
 
     sendToDiscord(process.env.WEBHOOK_NEW_ACCOUNT, {
-      title: 'Novo Pedido de Conta Recebido',
+      title: 'Nova Conta Criada',
       color: 'FFDE59',
       fields: [
         { name: 'User ID', value: user[0].user_id },
         { name: 'Nome', value: data.name, inline: true },
         { name: 'Email', value: data.email, inline: true },
         { name: 'Notificações', value: data.receive_notifications },
+        { name: 'Token de Verificação', value: verificationToken },
         { name: 'IP', value: ip, inline: true },
         { name: 'User Agent', value: userAgent, inline: true },
         { name: 'Timestamp', value: `<t:${Math.floor(Date.now() / 1000)}:R>` },
@@ -80,5 +81,29 @@ module.exports = (app) => {
     });
   };
 
-  return { signup };
+  const verify = async (token, ip, userAgent) => {
+    const verification = await app.db('account_verifications').where({ verification_token: token }).first(['user_id']);
+
+    if (!verification) throw new ValidationError('Token de verificação inválido!', 'verification_token', token);
+
+    await app.db('account_verifications').where({ user_id: verification.user_id }).delete();
+
+    await app.db('users').update({ is_verified: true }).where({ id: verification.user_id });
+
+    sendToDiscord(process.env.WEBHOOK_NEW_ACCOUNT, {
+      title: 'Conta Verificada',
+      color: '7DDA58',
+      fields: [
+        { name: 'User ID', value: verification.user_id },
+        { name: 'Token de Verificação', value: token },
+        { name: 'IP', value: ip, inline: true },
+        { name: 'User Agent', value: userAgent, inline: true },
+        { name: 'Timestamp', value: `<t:${Math.floor(Date.now() / 1000)}:R>` },
+      ],
+    });
+
+    return verification.user_id;
+  };
+
+  return { signup, verify };
 };
