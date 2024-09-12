@@ -7,6 +7,9 @@ const { v4: uuidv4 } = require('uuid');
 const knex = require('knex');
 
 const knexfile = require('../knexfile');
+const { checkEnvVars } = require('./utils/checkEnvVars');
+
+checkEnvVars();
 
 app.use(cors());
 app.set('trust proxy', 1);
