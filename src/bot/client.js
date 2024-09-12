@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 const {
-  Client, GatewayIntentBits, Collection, REST, Routes,
+  Client, GatewayIntentBits, Collection, REST, Routes, ActivityType,
 } = require('discord.js');
 
 module.exports = (app) => {
@@ -42,6 +42,19 @@ module.exports = (app) => {
       console.error('Erro ao executar o comando:', error);
       await interaction.reply({ content: 'Houve um erro ao executar o comando!', ephemeral: true });
     }
+  });
+
+  client.once('ready', () => {
+    client.user.setPresence({
+      activities: [
+        {
+          name: 'Custom',
+          type: ActivityType.Custom,
+          state: 'A relaxar com uma boa série',
+        },
+      ],
+      status: 'dnd',
+    });
   });
   return client;
 };

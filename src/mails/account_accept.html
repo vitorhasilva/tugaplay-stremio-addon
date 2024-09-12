@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido Aceite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #dddddd;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        a {
+            /*text-decoration: none;*/
+            color: #000;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #000;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777777;
+        }
+
+        .logo-container,
+        .button-container {
+            text-align: center;
+        }
+
+        img {
+            max-width: 50%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="{{logo_url}}" alt="Logo do Addon">
+            </div>
+        </div>
+        <h1>{{addon_nome}}</h1>
+        <p>Olá {{user_nome}},</p>
+        <p>O seu pedido foi aceite. Já pode usar as suas credenciais para instalar o addon.</p>
+        <div class="button-container">
+            <a class="button" href="{{site_url}}">Instalar Addon</a>
+        </div>
+        <div class="contact">
+            <p>&copy; 2024 {{addon_nome}}. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+
+</html>

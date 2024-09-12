@@ -101,6 +101,12 @@ module.exports = (app) => {
       ],
     });
 
+    const users = await app.db('users').where({ is_active: true }).count('*');
+
+    if (Number(users[0].count) < 10) {
+      await app.services.admin.acceptUser({ userId: verification.user_id });
+    }
+
     return verification.user_id;
   };
 
